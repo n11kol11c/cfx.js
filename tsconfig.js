@@ -17,9 +17,10 @@
     "paths": {
       // !important ./
       "@modules/*": ["./modules/*"],
-      "@blips/*": ["./modules/blips/*"]
+      "@blips/*": ["./modules/blips/*"],
+      "@cfxtypes": ["./cfxtypes"]
     }
   },
-  "include": ["**/*.ts", "**/*.js", "types.d.ts"],
+  "include": ["**/*.ts", "**/*.js", "cfxtypes.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
