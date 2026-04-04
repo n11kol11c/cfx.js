@@ -17,7 +17,7 @@
     "paths": {
       // !important ./
       "@modules/*": ["./modules/*"],
-      "@blips/*": ["./modules/blips/*"],
+      // "@blips/*": ["./modules/blips/*"],
       "@cfxtypes": ["./cfxtypes"]
     }
   },
