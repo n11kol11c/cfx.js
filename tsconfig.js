@@ -15,10 +15,11 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
+      // !important ./
       "@modules/*": ["./modules/*"],
       "@blips/*": ["./modules/blips/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.js"],
+  "include": ["**/*.ts", "**/*.js", "types.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
