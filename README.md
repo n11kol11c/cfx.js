@@ -25,5 +25,5 @@
 </p>
 <hr>
 
-_**cfxre.js**_ is a premium `TypeScript/JavaScript` toolkit designed to bridge the gap between modern web standards and the `Grand Theft Auto V runtime`. It transforms the chaotic world of raw game natives into a structured, type-safe, and developer-friendly environment.
-
+_**cfxre.js**_ is a premium `TypeScript/JavaScript` toolkit designed to bridge the gap between modern web standards and the 
+`Grand Theft Auto V runtime`. It transforms the chaotic world of raw game natives into a structured, type-safe, and developer-friendly environment.
