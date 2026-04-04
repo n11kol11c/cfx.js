@@ -1,6 +1,7 @@
 <div align="center">
     <h1>Cfxre.JS</h1>
     <h3>Clean & Modular Javascript Framework for FiveM</h3>
+    <p>ESX and OX Compatible</p>
 </div>
 <hr>
 <p align="center">
