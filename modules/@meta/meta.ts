@@ -1,4 +1,4 @@
-import { AppError } from "@exception/errors";
+import { ErrorType } from "@exception/errors";
 
 let versionCache: string = "1.0.0";
 let authorCache: string = "Matija";
@@ -35,7 +35,7 @@ function setCurrentAuthor(author: string): string {
         authorCache = author;
         return author;
     } else {
-        throw new AppError(`[cfxjs] Invalid data type passed to setCurrentAuthor. Expected string, got ${typeof author}`)
+        throw new Error(`[cfxjs] Invalid data type passed to setCurrentAuthor. Expected string, got ${typeof author}`)
     }
 }
 
