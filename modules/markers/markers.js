@@ -1,200 +1,91 @@
 import { CfxAuth } from './markersauth.js';
 
-export class Marker {
-    constructor(id, options = {}) {
-        this.id = id;
-        this.active = options.active ?? true;
-        this.isPlayerInside = false;
-
-        this.pos = options.pos ?? { x: 0, y: 0, z: 0 };
-        this.interactPos = options.interactPos ?? this.pos;
-
-        this.type = options.type ?? 1;
-        this.dir = options.dir ?? { x: 0.0, y: 0.0, z: 0.0 };
-        this.rot = options.rot ?? { x: 0.0, y: 0.0, z: 0.0 };
-        this.scale = options.scale ?? { x: 1.0, y: 1.0, z: 1.0 };
-        this.rgba = options.rgba ?? { r: 255, g: 255, b: 255, a: 100 };
-        this.bob = options.bob ?? false;
-        this.faceCamera = options.faceCamera ?? false;
-        this.rotationOrder = options.rotationOrder ?? 2;
-        this.rotate = options.rotate ?? false;
-        this.texture = options.texture ?? { dict: null, name: null };
-        this.drawOnEnts = options.drawOnEnts ?? false;
-
-        this.drawDistance = options.drawDistance ?? 10.0;
-        this.interactDistance = options.interactDistance ?? 1.5;
-        this.zTolerance = options.zTolerance ?? 2.0;
-        this.requireKeyPress = options.requireKeyPress ?? true;
-        this.interactKey = options.interactKey ?? 38;
-
-        this.text = options.text ?? null;
-        this.textOptions = {
-            scale: options.textScale ?? 0.35,
-            font: options.textFont ?? 4,
-            color: options.textColor ?? { r: 255, g: 255, b: 255, a: 215 },
-            offsetZ: options.textOffsetZ ?? 0.6,
-            center: options.textCenter ?? true,
-            outline: options.textOutline ?? true
-        };
-
-        this.onInteract = options.onInteract || null;
-        this.onEnter = options.onEnter || null;
-        this.onExit = options.onExit || null;
-    }
-
-    draw() {
-        DrawMarker(
-            this.type,
-            this.pos.x, this.pos.y, this.pos.z,
-            this.dir.x, this.dir.y, this.dir.z,
-            this.rot.x, this.rot.y, this.rot.z,
-            this.scale.x, this.scale.y, this.scale.z,
-            this.rgba.r, this.rgba.g, this.rgba.b, this.rgba.a,
-            this.bob, this.faceCamera, this.rotationOrder, this.rotate,
-            this.texture.dict, this.texture.name, this.drawOnEnts
-        );
-
-        if (this.text) this.draw3DText();
-    }
-
-    draw3DText() {
-        const [onScreen, x, y] = GetScreenCoordFromWorldCoord(
-            this.pos.x, this.pos.y, this.pos.z + this.textOptions.offsetZ
-        );
-        if (onScreen) {
-            SetTextScale(this.textOptions.scale, this.textOptions.scale);
-            SetTextFont(this.textOptions.font);
-            SetTextProportional(1);
-            SetTextColour(
-                this.textOptions.color.r,
-                this.textOptions.color.g,
-                this.textOptions.color.b,
-                this.textOptions.color.a
-            );
-            if (this.textOptions.outline) SetTextOutline();
-            SetTextEntry("STRING");
-            if (this.textOptions.center) SetTextCentre(1);
-            AddTextComponentString(this.text);
-            DrawText(x, y);
-        }
-    }
-}
-
-export const MarkerSystem = {
-    cache: new Map(),
-    tickRunning: false,
-
-    create(id, options) {
-        const marker = new Marker(id, options);
-        this.cache.set(id, marker);
-        this.startLoop();
-        return marker;
-    },
-
-    remove(id) {
-        this.cache.delete(id);
-    },
-
-    clear() {
-        this.cache.clear();
-    },
-
-    startLoop() {
-        if (this.tickRunning) return;
-        this.tickRunning = true;
-
-        setTick(async () => {
-            if (this.cache.size === 0) {
-                this.tickRunning = false;
-                return;
-            }
-
-            const pCoords = GetEntityCoords(PlayerPedId());
-            let sleep = 1000;
-
-            this.cache.forEach((m) => {
-                if (!m.active) return;
-
-                const dx = pCoords[0] - m.interactPos.x;
-                const dy = pCoords[1] - m.interactPos.y;
-                const dz = pCoords[2] - m.interactPos.z;
-                const distSq = dx * dx + dy * dy + dz * dz;
-
-                if (distSq < Math.pow(m.drawDistance, 2)) {
-                    sleep = 0;
-                    m.draw();
-
-                    const isInside = (distSq < Math.pow(m.interactDistance, 2)) && (Math.abs(dz) < m.zTolerance);
-
-                    if (isInside && !m.isPlayerInside) {
-                        m.isPlayerInside = true;
-                        if (m.onEnter) m.onEnter(m.interactPos);
-                        if (!m.requireKeyPress && m.onInteract) m.onInteract(m.interactPos);
-                    } else if (!isInside && m.isPlayerInside) {
-                        m.isPlayerInside = false;
-                        if (m.onExit) m.onExit(m.interactPos);
-                    }
-
-                    if (m.isPlayerInside && m.requireKeyPress && m.onInteract) {
-                        if (IsControlJustReleased(0, m.interactKey)) {
-                            m.onInteract(m.interactPos);
-                        }
-                    }
-                } else {
-                    m.isPlayerInside = false;
-                }
-            });
-
-            if (sleep > 0) await new Promise(r => setTimeout(r, sleep));
-        });
-    }
-};
-
 export class CfxMarker {
+    /**
+     * @param {string} id
+     */
     constructor(id) {
+        /** @type {string} */
         this.id = id;
+        /** @type {boolean} */
         this.active = true;
+        /** @type {boolean} */
         this.isPlayerInside = false;
-
+        /** @type {{x: number, y: number, z: number}} */
         this.pos = { x: 0, y: 0, z: 0 };
+        /** @type {{x: number, y: number, z: number}} */
         this.interactPos = { x: 0, y: 0, z: 0 };
+        /** @type {number} */
         this.type = 1;
+        /** @type {{x: number, y: number, z: number}} */
         this.dir = { x: 0.0, y: 0.0, z: 0.0 };
+        /** @type {{x: number, y: number, z: number}} */
         this.rot = { x: 0.0, y: 0.0, z: 0.0 };
+        /** @type {{x: number, y: number, z: number}} */
         this.scale = { x: 1.0, y: 1.0, z: 1.0 };
+        /** @type {{r: number, g: number, b: number, a: number}} */
         this.rgba = { r: 255, g: 255, b: 255, a: 150 };
+        /** @type {boolean} */
         this.bob = false;
+        /** @type {boolean} */
         this.faceCamera = false;
+        /** @type {boolean} */
         this.rotate = false;
+        /** @type {number} */
         this.rotationOrder = 2;
+        /** @type {{dict: string | null, name: string | null}} */
         this.texture = { dict: null, name: null };
+        /** @type {boolean} */
         this.drawOnEnts = false;
-
+        /** @type {number} */
         this.drawDistance = 15.0;
+        /** @type {number} */
         this.interactDistance = 1.5;
+        /** @type {number} */
         this.zTolerance = 2.0;
+        /** @type {boolean} */
         this.requireKeyPress = true;
+        /** @type {number} */
         this.interactKey = 38;
-
+        /** @type {string | null} */
         this.text = null;
+        /** @type {number} */
         this.textScale = 0.35;
+        /** @type {number} */
         this.textFont = 4;
+        /** @type {{r: number, g: number, b: number, a: number}} */
         this.textColor = { r: 255, g: 255, b: 255, a: 255 };
+        /** @type {number} */
         this.textOffsetZ = 0.6;
+        /** @type {boolean} */
         this.textOutline = true;
+        /** @type {boolean} */
         this.textShadow = false;
+        /** @type {boolean} */
         this.textCenter = true;
-
+        /** @type {string | null} */
         this.job = null;
+        /** @type {number} */
         this.rank = 0;
+        /** @type {string | null} */
         this.citizenid = null;
+        /** @type {boolean} */
         this.restricted = false;
-
+        /** @type {((pos: {x: number, y: number, z: number}) => void) | null} */
         this.onInteract = null;
+        /** @type {((pos: {x: number, y: number, z: number}) => void) | null} */
         this.onEnter = null;
+        /** @type {((pos: {x: number, y: number, z: number}) => void) | null} */
         this.onExit = null;
     }
 
+    /**
+     * 
+     * @param {number} x - X value
+     * @param {number} y - Y value
+     * @param {number} z - Z value
+     * @returns {this}
+     */
     setMarkerPos(x, y, z) {
         this.pos = { x, y, z };
         if (this.interactPos.x === 0) this.interactPos = { x, y, z };
