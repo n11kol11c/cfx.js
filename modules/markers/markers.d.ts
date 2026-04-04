@@ -11,53 +11,37 @@ import { CfxAuth } from './markersauth.js';
 export class CfxMarker {
     /** @param id - Unique identifier for the marker instance. */
     constructor(id: string);
-
-    // --- State Properties ---
     id: string;
-    active: boolean;                   // Toggle for logic and rendering
-    isPlayerInside: boolean;           // Tracks if local player is within interactDistance
-    
-    // --- Spatial Properties ---
-    pos: { x: number; y: number; z: number };           // Visual marker position
-    interactPos: { x: number; y: number; z: number };   // Interaction trigger position
-    
-    // --- Visual Configuration ---
-    type: number;                      // Native GTA marker type ID
+    active: boolean;                                                    // Toggle for logic and rendering
+    isPlayerInside: boolean;                                            // Tracks if local player is within interactDistance
+    pos: { x: number; y: number; z: number };                           // Visual marker position
+    interactPos: { x: number; y: number; z: number };                   // Interaction trigger position
+    type: number;                                                       // Native GTA marker type ID
     dir: { x: number; y: number; z: number };
     rot: { x: number; y: number; z: number };
     scale: { x: number; y: number; z: number };
     rgba: { r: number; g: number; b: number; a: number };
-    
-    // --- Animation & Rendering Flags ---
-    bob: boolean;                      // Float up and down effect
-    faceCamera: boolean;               // Always rotate towards the player's camera
-    rotate: boolean;                   // Constant rotation on the Z-axis
+    bob: boolean;                                                       // Float up and down effect
+    faceCamera: boolean;                                                // Always rotate towards the player's camera
+    rotate: boolean;                                                    // Constant rotation on the Z-axis
     rotationOrder: number;
     texture: { dict: string | null; name: string | null };
-    drawOnEnts: boolean;               // Whether to render the marker on top of entities
-    
-    // --- Logic Distances ---
-    drawDistance: number;              // Distance at which the marker becomes visible
-    interactDistance: number;          // Distance at which onEnter/onAction triggers
-    zTolerance: number;                // Height difference allowed for interaction
-    
-    // --- Restrictions & Auth ---
-    job: string | null;                // Job requirement (ESX/Qbox)
-    citizenid: null | boolean;         // Specific Citizen ID requirement
-    
-    // --- Interaction & UI ---
-    requireKeyPress: boolean;          // If true, onAction only triggers on key press
-    interactKey: number;               // Native key code (e.g., 38 for 'E')
-    text: string | null;               // Floating 3D text content
+    drawOnEnts: boolean;                                                // Whether to render the marker on top of entities
+    drawDistance: number;                                               // Distance at which the marker becomes visible
+    interactDistance: number;                                           // Distance at which onEnter/onAction triggers
+    zTolerance: number;                                                 // Height difference allowed for interaction
+    job: string | null;                                                 // Job requirement (ESX/Qbox)
+    citizenid: null | boolean;                                          // Specific Citizen ID requirement
+    requireKeyPress: boolean;                                           // If true, onAction only triggers on key press
+    interactKey: number;                                                // Native key code (e.g., 38 for 'E')
+    text: string | null;                                                // Floating 3D text content
     textScale: number;
     textFont: number;
     textColor: { r: number; g: number; b: number; a: number };
-    textOffsetZ: number;               // Height offset for the floating text
+    textOffsetZ: number;                                                // Height offset for the floating text
     textOutline: boolean;
     textShadow: boolean;
     textCenter: boolean;
-
-    // --- Fluent API Methods (Setters) ---
 
     /** Updates the visual position of the marker. */
     setMarkerPos(x: number, y: number, z: number): this;
@@ -131,3 +115,28 @@ export const CfxMarkerSystem: {
     /** Starts the main tick handler for rendering and distance checks. */
     start(): void;
 };
+
+/**
+ * Interface representing the restriction criteria for a marker.
+ */
+export interface MarkerRestriction {
+    /** Whether the marker has any active restrictions. */
+    restricted: boolean;
+    /** The internal job name required (e.g., 'police'). */
+    job?: string | null;
+    /** The minimum job grade level required (0 to ignore). */
+    rank: number;
+    /** A specific Citizen ID required for access. */
+    citizenid?: string | null;
+}
+
+/**
+ * Global authorization utility for validating player access rights.
+ */
+export declare interface CfxAuth {
+    /**
+     * Checks the local player's Qbox data against marker restrictions.
+     * @param marker - An object containing restriction data.
+     */
+    canAccess(marker: MarkerRestriction): boolean;
+}
