@@ -20,10 +20,8 @@ export const CfxPromise = {
         const stop = () => { running = false; };
         
         while (running) {
-            // Executes the callback and allows it to be asynchronous
             const result = await callback(stop);
-            
-            // Allow termination by returning false from the callback
+
             if (result === false || !running) break;
             
             await this.wait(ms);
