@@ -1,6 +1,4 @@
-// @file promise.d.ts
-// @autor Matija
-// @versiopn 1.0.0
+// modules/utils/promise.d.ts
 
 /**
  * Callback function to terminate an active loop.
@@ -23,8 +21,7 @@ export interface CfxPromiseModule {
      * Pauses the execution of the current thread for a specified duration.
      * * @param ms - The duration to wait in milliseconds.
      * @returns A promise that resolves after the timeout.
-     * * @example
-     * await CfxPromise.wait(1000); // Wait for 1 second
+     * @example await CfxPromise.wait(1000); // Wait for 1 second
      */
     wait(ms: number): Promise<void>;
 
@@ -34,12 +31,12 @@ export interface CfxPromiseModule {
      * @param callback - The function to execute. Receives a `stop` function as an argument.
      * @returns A promise that resolves when the loop is stopped.
      * * @example
-     * CfxPromise.loop(500, (stop) => {
+     * CfxPromise.thread(500, (stop) => {
      * if (someCondition) stop();
      * console.log("Tick");
      * });
      */
-    loop(ms: number, callback: LoopCallback): Promise<void>;
+    thread(ms: number, callback: LoopCallback): Promise<void>;
 
     /**
      * Returns the current system timestamp in milliseconds.
