@@ -1,3 +1,5 @@
+export declare const ESX: readonly any;
+
 /**
  * A static list of internal command identifiers registered by the cfxre.js library.
  * * @description
