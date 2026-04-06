@@ -1,3 +1,14 @@
+const ESX = exports['es_extended'].getSharedObject();
+
+/**
+ * @type {readonly string[]}
+ */
+const AddonCommandsList = [
+    'getversion',
+    'getauthor',
+    'gta:settime'
+];
+
 Cfxjs.ConsoleCommand('getversion', 'Get current cfxre.js library version', [], false, 
     /**
      * @param {number} source - Player ID (gathered by server)
@@ -56,5 +67,36 @@ Cfxjs.ConsoleCommand('gta:settime', 'Set current in-game time', ['hours', 'minut
         const successMessage = `^2Time set to ^5${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
         if (source === 0) console.log(successMessage);
         else emitNet('chat:addMessage', source, { args: ['^2[Cfxre.js]', successMessage] });
+    }
+);
+
+Cfxjs.ConsoleCommand('gta:setweather', 'Change current in-game weather', ['weatherType'], true,
+    /**
+     * @param {number} source - Player ID (gathered by server)
+     * @param {string[]} args - Arguments list
+     * @param {string} raw - Raw input
+     */
+    (source, args, raw) => {
+        const weatherType = String(args[0]);
+        const allowedTypes = [
+            'EXTRASUNNY', 'CLEAR',
+            'NEUTRAL', 'SMOG', 'FOGGY',
+            'OVERCAST', 'CLOUDS', 'CLEARING',
+            'RAIN', 'THUNDER', 'SNOW', 'BLIZZARD',
+            'SNOWLIGHT', 'XMAS', 'HALLOWEEN'
+        ];
+
+        if (source !== 0) {
+            console.log(`You are not allowed to use this command.`);
+        }
+
+        for (let i = 0; i < allowedTypes.length - 1; i++) {
+            if (weatherType != allowedTypes[i]) continue;
+            else {
+                SetWeatherTypeNowPersist(weatherType);
+                SetWeatherTypeNow(weatherType);
+                SetOverrideWeather(weatherType);
+            }
+        }
     }
 )
