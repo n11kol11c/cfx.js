@@ -10,7 +10,7 @@ export interface CfxjsLibrary {
      * Creates a new instance of a world marker.
      * @param id - Unique identifier for the marker.
      */
-    Marker: (id: string) => import('@cfxmodules/markers/markers').CfxMarker;
+    Marker: (id: string) => import('../modules/markers/markers').CfxMarker;
 
     /**
      * The core marker management system for handling bulk updates and rendering.
